@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "common/*": [
+        "./common/*"
+      ],
+      "routes/*": [
+        "./routes/*"
+      ],
+      "reqSchemas/*": [
+        "./routes/schema/*"
+      ],
+      "filesManagers": [
+        "./common/filesManagers.js"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ]
+}

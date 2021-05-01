@@ -1,0 +1,22 @@
+{
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://example.com/object1619614888.json", 
+	"title": "Object of properties: dataDirectory", 
+	"type": "object",
+	"required": [
+		"dataDirectory"
+	],
+	"properties": {
+		"dataDirectory": {
+			"$id": "#root/dataDirectory", 
+			"title": "DataDirectory", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"src/data/out"
+			],
+			"pattern": "^.*$"
+		}
+	}
+}

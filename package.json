@@ -1,0 +1,46 @@
+{
+  "name": "autonomous-node-projects-manager",
+  "version": "0.8.0",
+  "description": "Easy manager with automation for your node projects!",
+  "main": "index.js",
+  "nodemonConfig": {
+    "env": {
+      "NODE_ENV": "dev"
+    },
+    "watch": [
+      "src"
+    ],
+    "exec": "babel-node src/index.js"
+  },
+  "scripts": {
+    "start": "NODE_ENV=prod babel-node src/index.js",
+    "dev": "nodemon",
+    "lint": "eslint src/**/*.js"
+  },
+  "author": "Daniel Goliszewski",
+  "license": "MIT",
+  "dependencies": {
+    "@autonomous-node-projects/tools": "^1.0.0",
+    "@babel/core": "^7.14.0",
+    "@babel/node": "^7.13.13",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "directory-tree": "^2.2.9",
+    "dotenv": "^8.2.0",
+    "enjoi": "^9.0.0",
+    "eslint-import-resolver-babel-module": "^5.3.1",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "express-formidable": "^1.2.0",
+    "joi": "^17.4.0",
+    "mongodb": "^3.6.6",
+    "mongoose": "^5.12.5",
+    "tar-fs": "^2.1.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.24.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "nodemon": "^2.0.7"
+  }
+}

@@ -1,0 +1,119 @@
+{
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://example.com/object1619614634.json", 
+	"title": "Root", 
+	"type": "object",
+	"required": [
+		"archive"
+	],
+	"properties": {
+		"archive": {
+			"$id": "#root/archive", 
+			"title": "Archive", 
+			"type": "object",
+			"required": [
+				"name",
+				"data",
+				"size",
+				"encoding",
+				"tempFilePath",
+				"truncated",
+				"mimetype",
+				"md5"
+			],
+			"properties": {
+				"name": {
+					"$id": "#root/archive/name", 
+					"title": "Name", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"test.tar"
+					],
+					"pattern": "^.*$"
+				},
+				"data": {
+					"$id": "#root/archive/data", 
+					"title": "Data", 
+					"type": "object",
+					"properties": {
+						"type": {
+							"$id": "#root/archive/data/type", 
+							"title": "Type", 
+							"type": "string",
+							"default": "",
+							"examples": [
+								"Buffer"
+							],
+							"pattern": "^.*$"
+						},
+						"data": {
+							"$id": "#root/archive/data/data", 
+							"title": "Data", 
+							"type": "array",
+							"default": []
+						}
+					}
+				}
+,
+				"size": {
+					"$id": "#root/archive/size", 
+					"title": "Size", 
+					"type": "integer",
+					"examples": [
+						123
+					],
+					"default": 0
+				},
+				"encoding": {
+					"$id": "#root/archive/encoding", 
+					"title": "Encoding", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"7bit"
+					],
+					"pattern": "^.*$"
+				},
+				"tempFilePath": {
+					"$id": "#root/archive/tempFilePath", 
+					"title": "Tempfilepath", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"/tmp/tmp-1-x"
+					],
+					"pattern": "^.*$"
+				},
+				"truncated": {
+					"$id": "#root/archive/truncated", 
+					"title": "Truncated", 
+					"type": "boolean",
+					"examples": [
+						false
+					],
+					"default": true
+				},
+				"mimetype": {
+					"$id": "#root/archive/mimetype", 
+					"title": "Mimetype", 
+					"type": "string",
+					"default": "",
+					"examples": [
+						"application/x-tar"
+					],
+					"pattern": "application/x-tar"
+				},
+				"md5": {
+					"$id": "#root/archive/md5", 
+					"title": "Md5", 
+					"type": "string",
+					"default": "",
+					"pattern": "^.*$"
+				}
+			}
+		}
+
+	}
+}
