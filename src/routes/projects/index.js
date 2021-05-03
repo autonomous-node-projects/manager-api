@@ -1,62 +1,44 @@
-// System
 const tar = require('tar-fs');
 const fs = require('fs');
 
-// Express
-const express = require('express');
-
-module.exports = express();
-const app = module.exports;
-
-// Common
 const { Log } = require('@autonomous-node-projects/tools');
-const Response = require('common/responseCreator');
+const Response = require('services/responseCreator');
 
-// Data and schemas Manager
-const { projectsFilesManager, schemasFilesManager } = require('common/filesManagers');
+const { projectsFilesManager } = require('common/filesManagers');
 
-// Mongo
-require('common/database/db');
-const Projects = require('common/database/models/projects');
+require('database/db');
+const Projects = require('database/models/projects');
 
-// Processes
 const {
   installPackages,
   listOfProcesses,
   listOfIntervals,
   killProcess,
   killInterval,
-} = require('common/processesManagment');
-const checkSchema = require('common/schemaChecker');
+} = require('services/processesManagment');
 
-//
-// Upload
-//
-app.post('/project', async (req, res) => {
-  // Get schemas
-  const schemas = {
-    files: await schemasFilesManager.readData('uploadProject/files.schema.json'),
-    body: await schemasFilesManager.readData('uploadProject/body.schema.json'),
+const checkSchema = require('services/schemaChecker');
+
+const { jsonSchema: postFormDataJSON } = require('./schema/post/formData.schema');
+const { openAPISchema: responseJSONOpenAPIpost200 } = require('./schema/post/responses/200.schema');
+const { openAPISchema: responseJSONOpenAPIget200 } = require('./schema/get/responses/200.schema');
+const { openAPISchema: responseJSONOpenAPIdelete200 } = require('./schema/delete/responses/200.schema');
+
+const POST = async (req, res) => {
+  const formData = {
+    files: req.files,
+    body: req.body,
   };
   // Check schemas
-  const schemaResult = {
-    files: checkSchema(schemas.files, req.files),
-    body: checkSchema(schemas.body, req.body),
-  };
+  const schemaResult = checkSchema(postFormDataJSON, formData);
+  Log(schemaResult);
 
-  if (schemaResult.files.error) {
+  if (schemaResult.error) {
     Response.error(res, {
-      status: 500, data: schemaResult.files.error,
+      status: 400, data: schemaResult.error,
     });
     return;
   }
-  if (schemaResult.body.error) {
-    Response.error(res, {
-      status: 500, data: schemaResult.body.error,
-    });
-    return;
-  }
-
   const { files } = req;
   const projectName = files.archive.name.substring(0, files.archive.name.length - 4);
 
@@ -112,16 +94,13 @@ app.post('/project', async (req, res) => {
     Response.error(res, {
       status: 409,
       data: {
-        details: 'Projects already exists!',
+        details: 'Project already exists!',
       },
     });
   }
-});
+};
 
-//
-// Delete
-//
-app.delete('/projects', async (req, res) => {
+const DELETE = async (req, res) => {
   try {
     const project = await Projects.findOneAndDelete(req.query.id);
     if (project) {
@@ -161,10 +140,9 @@ app.delete('/projects', async (req, res) => {
       },
     });
   }
-});
+};
 
-// Get projects list
-app.get('/projects', async (req, res) => {
+const GET = async (req, res) => {
   const docs = await Projects.find();
   Response.success(res, {
     status: 200,
@@ -172,4 +150,92 @@ app.get('/projects', async (req, res) => {
       details: 'List of all projects', data: docs,
     },
   });
-});
+};
+
+POST.apiDoc = {
+  summary: 'Upload project.',
+  operationId: 'uploadProject',
+  consumes: ['multipart/form-data'],
+  tags: [
+    __dirname.split(/[\\/]/).pop(),
+  ],
+  parameters: [
+    {
+      in: 'formData',
+      name: 'archive',
+      required: true,
+      type: 'file',
+      description: 'Tar file of project files',
+    },
+    {
+      in: 'formData',
+      name: 'dataDirectory',
+      type: 'string',
+      description: 'Directory with output from project',
+    },
+  ],
+  responses: {
+    200: {
+      description: 'Added new project',
+      schema: responseJSONOpenAPIpost200,
+    },
+    400: {
+      description: 'Bad Requests',
+      schema: {
+        $ref: '#/definitions/BadRequest',
+      },
+    },
+    409: {
+      description: 'Project already exists',
+    },
+    500: {
+      description: 'Request couldnt be processed',
+    },
+  },
+};
+
+GET.apiDoc = {
+  summary: 'Get array of projects.',
+  operationId: 'getProjects',
+  tags: [
+    __dirname.split(/[\\/]/).pop(),
+  ],
+  responses: {
+    200: {
+      description: 'Array of uploaded projects',
+      schema: responseJSONOpenAPIget200,
+    },
+  },
+};
+
+DELETE.apiDoc = {
+  summary: 'Delete project.',
+  operationId: 'deleteProject',
+  tags: [
+    __dirname.split(/[\\/]/).pop(),
+  ],
+  parameters: [{
+    in: 'query',
+    name: 'id',
+    required: true,
+    type: 'string',
+    description: 'ID of single project',
+  }],
+  responses: {
+    200: {
+      description: 'Removed project',
+      schema: responseJSONOpenAPIdelete200,
+    },
+    404: {
+      description: 'Couldnt find project to be removed',
+    },
+  },
+};
+
+const operations = {
+  POST,
+  GET,
+  DELETE,
+};
+
+module.exports = operations;

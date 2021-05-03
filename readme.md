@@ -16,7 +16,7 @@ DB_URL='mongodb://localhost:27017'
 DB_DB='ANPM'
 ```
 5. Create TAR archive of your node root files (those among package.json)
-6. Upload this TAR archive file to projects_files directory via `${API_IP}/projects/upload` (eg. http://localhost:3000/project/upload) endpoint
+6. Upload this TAR archive file to projects_files directory via `${API_IP}/projects` (eg. http://localhost:3000/projects) endpoint
 7. Schedule any script you want to run by via `${API_IP}/schedules?id={projectId}`(eg. http://localhost:3000/schedules?id=608d79d77a728a50231001ac) endpoint using body:
 ```
 [
@@ -37,4 +37,7 @@ Keys values: <br/>
 * `every.timeType` - type of time used as interval </br>
 * `exitAfter` - amount of how many times script should be run and then terminated
 
-8. Download output data via `${API_IP}/output/download` endpoint
+8. Download output data via `${API_IP}/output?type=download` endpoint
+
+### Documentation
+There is swagger viewer of Open API documentation under `${API_IP}/swagger`.

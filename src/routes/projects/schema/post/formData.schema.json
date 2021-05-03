@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "test",
+  "type": "object",
+  "properties": {
+    "files": {
+      "type": "object",
+      "properties": {
+        "archive": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "properties": {}
+                  }
+                }
+              }
+            },
+            "size": {
+              "type": "number"
+            },
+            "encoding": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tempFilePath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "truncated": {
+              "type": "boolean"
+            },
+            "mimetype": {
+              "type": "string",
+              "minLength": 1
+            },
+            "md5": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "name",
+            "data",
+            "size",
+            "encoding",
+            "tempFilePath",
+            "truncated",
+            "mimetype",
+            "md5"
+          ]
+        }
+      },
+      "required": [
+        "archive"
+      ]
+    },
+    "body": {
+      "type": "object",
+      "properties": {
+        "dataDirectory": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "files"
+  ]
+}

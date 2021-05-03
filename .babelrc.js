@@ -6,9 +6,8 @@ module.exports = {
       {
         root: ["./src/"],
         alias: {
-          "common/*": "./src/common/*",
+          "services/*": "./src/services/*",
           "routes/*": "./src/routes/*",
-          "reqSchemas/*": "./src/routes/schema/*",
           "filesManagers": "./src/common/filesManagers.js"
         }
       }
