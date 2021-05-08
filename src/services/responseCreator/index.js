@@ -23,13 +23,15 @@ const checkResponseData = async (responseObject) => {
 
 function Response() {}
 
-Response.error = async (res, error) => {
+Response.error = async (res, error, contentType = 'application/json') => {
   checkResponseData(error);
+  res.set('Content-Type', contentType);
   res.status(error.status).send(error.data);
 };
 
-Response.success = (res, success) => {
+Response.success = (res, success, contentType = 'application/json') => {
   checkResponseData(success);
+  res.set('Content-Type', contentType);
   res.status(success.status).send(success.data);
 };
 

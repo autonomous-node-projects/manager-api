@@ -30,29 +30,38 @@ const GET = async (req, res) => {
     }
   } else if (req.query.type === 'download') {
     const project = await Projects.findById(req.query.id);
-    try {
-      const dir = `${process.env.PROJECTS_FILES}${project.name}/${project.dataDirectory}`;
+    if (project.dataDirectory) {
+      try {
+        const dir = `${process.env.PROJECTS_FILES}${project.name}/${project.dataDirectory}`;
 
-      const tarFileAbsolutePath = resolve(`${process.env.TMP_FILES}${project.name}.tar`);
-      fs.mkdirSync(`${process.env.TMP_FILES}`, {
-        recursive: true,
-      });
+        const tarFileAbsolutePath = resolve(`${process.env.TMP_FILES}${project.name}.tar`);
+        fs.mkdirSync(`${process.env.TMP_FILES}`, {
+          recursive: true,
+        });
 
-      const writeStream = fs.createWriteStream(tarFileAbsolutePath);
-      const tarData = tar.pack(dir);
-      tarData.pipe(writeStream);
+        const writeStream = fs.createWriteStream(tarFileAbsolutePath);
+        const tarData = tar.pack(dir);
+        tarData.pipe(writeStream);
 
-      tarData.on('end', async () => {
-        res.setHeader('Content-Type', 'application/x-tar');
-        res.setHeader('Content-disposition', `attachment;filename=${project.name}.tar`);
-        res.sendFile(tarFileAbsolutePath);
-      });
-    } catch (e) {
-      Log(e);
+        tarData.on('end', async () => {
+          res.setHeader('Content-Type', 'application/x-tar');
+          res.setHeader('Content-disposition', `attachment;filename=${project.name}.tar`);
+          res.sendFile(tarFileAbsolutePath);
+        });
+      } catch (e) {
+        Log(e);
+        Response.error(res, {
+          status: 400,
+          data: {
+            details: 'no such a project 😓',
+          },
+        });
+      }
+    } else {
       Response.error(res, {
-        status: 400,
+        status: 404,
         data: {
-          details: 'no such a project 😓',
+          details: 'This project has no data output directory',
         },
       });
     }
