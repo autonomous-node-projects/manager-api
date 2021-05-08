@@ -20,7 +20,7 @@ const apiDoc = {
     },
     {
       name: 'output',
-      description: 'All endpoints of output 🏗',
+      description: 'All endpoints of output ✅',
     },
     {
       name: 'processes',

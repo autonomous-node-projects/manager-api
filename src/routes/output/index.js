@@ -69,7 +69,7 @@ const GET = async (req, res) => {
 };
 
 GET.apiDoc = {
-  summary: 'Got output data.',
+  summary: 'Get output data.',
   operationId: 'getOutput',
   consumes: ['application/json'],
   tags: [
@@ -87,15 +87,18 @@ GET.apiDoc = {
     name: 'type',
     required: true,
     type: 'string',
-    description: 'Type of returned data(tree or download)',
+    description: 'Type of data we are looking for - `tree` or `download`',
   },
   ],
   responses: {
     200: {
-      description: 'Output data as tree or file basing on query.type',
+      description: 'Output data as tree or file basing on `query.type`',
     },
     400: {
-      description: 'Didnt find projects',
+      description: 'Didnt find project',
+    },
+    404: {
+      description: 'Project exist but no directory for output data is specified',
     },
   },
 };
