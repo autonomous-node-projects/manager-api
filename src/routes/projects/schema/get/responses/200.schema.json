@@ -14,9 +14,7 @@
       "items": {
         "required": [
           "_id",
-          "name",
-          "dataDirectory",
-          "__v"
+          "name"
         ],
         "properties": {
           "_id": {

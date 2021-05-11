@@ -16,23 +16,23 @@ const apiDoc = {
   tags: [
     {
       name: 'intervals',
-      description: 'All endpoints of intervals 🏗',
+      description: 'All endpoints of intervals',
     },
     {
       name: 'output',
-      description: 'All endpoints of output ✅',
+      description: 'All endpoints of output',
     },
     {
       name: 'processes',
-      description: 'All endpoints of processes 🏗',
+      description: 'All endpoints of processes',
     },
     {
       name: 'projects',
-      description: 'All endpoints of projects ✅',
+      description: 'All endpoints of projects',
     },
     {
       name: 'schedules',
-      description: 'All endpoints of schedules ✅',
+      description: 'All endpoints of schedules',
     },
   ],
   definitions: {

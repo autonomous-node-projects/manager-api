@@ -12,14 +12,41 @@ const {
 
 const POST = async (req, res) => {
   const project = await Projects.findById(req.query.id);
-  Log(req.query.id);
-  const processId = spawnProcess(req.query.scriptName, project.name);
-  Response.success(res, {
-    status: 200,
-    data: {
-      details: `started ${req.body.scriptName} in ${project.name} marked with Id: ${processId}`,
-    },
+  const processesInformation = await req.query.scriptName.split(',').map((scriptName) => {
+    if (Object.keys(project.scripts).includes(scriptName)) {
+      const processId = spawnProcess(scriptName, project.name);
+      return {
+        scriptName,
+        processId,
+      };
+    }
+    return {
+      scriptName,
+      notFound: true,
+    };
   });
+
+  if (!processesInformation.find((processInfo) => { Object.keys(processInfo).includes('notFound'); })) {
+    Response.success(res, {
+      status: 404,
+      data: {
+        details: `started scripts in ${project.name}`,
+        data: {
+          ...processesInformation,
+        },
+      },
+    });
+  } else {
+    Response.success(res, {
+      status: 200,
+      data: {
+        details: `started scripts in ${project.name}`,
+        data: {
+          ...processesInformation,
+        },
+      },
+    });
+  }
 };
 
 const GET = async (req, res) => {
@@ -37,8 +64,9 @@ const GET = async (req, res) => {
 };
 
 const DELETE = async (req, res) => {
-  const result = killProcess(req.query.id);
-  if (result) {
+  const processesResult = req.query.id.split(',').map((id) => killProcess(id));
+  Log.warn(processesResult);
+  if (!processesResult.includes(false)) {
     Response.success(res, {
       status: 200,
       data: {
@@ -49,14 +77,14 @@ const DELETE = async (req, res) => {
     Response.error(res, {
       status: 400,
       data: {
-        details: 'Couldnt kill process',
+        details: 'Couldnt kill all processes',
       },
     });
   }
 };
 
 POST.apiDoc = {
-  summary: 'Spawn single process.',
+  summary: 'Spawn multiple processes for single project.',
   operationId: 'spawnProcesses',
   consumes: ['application/json'],
   tags: [
@@ -66,19 +94,19 @@ POST.apiDoc = {
     in: 'query',
     name: 'id',
     required: true,
-    description: 'ID of project to be spawned',
+    description: 'ID of project with scripts which will be spawned',
     type: 'string',
   },
   {
     in: 'query',
     name: 'scriptName',
     required: true,
-    description: 'Script name from project to be spawned',
+    description: 'Scripts names from project to be spawned',
     type: 'string',
   }],
   responses: {
     200: {
-      description: 'Started new scripts',
+      description: 'Started new processes',
     },
   },
 };
@@ -92,13 +120,13 @@ GET.apiDoc = {
   ],
   responses: {
     200: {
-      description: 'Array of running scripts',
+      description: 'Array of all running processes',
     },
   },
 };
 
 DELETE.apiDoc = {
-  summary: 'Delete running processes array.',
+  summary: 'Kill processes.',
   operationId: 'killProcess',
   consumes: ['application/json'],
   tags: [
@@ -108,11 +136,12 @@ DELETE.apiDoc = {
     in: 'query',
     name: 'id',
     required: true,
+    description: 'Processes Ids to be killed',
     type: 'string',
   }],
   responses: {
     200: {
-      description: 'Array of running scripts',
+      description: 'Killed processes',
     },
     400: {
       description: 'Couldnt find scripts to be killed',

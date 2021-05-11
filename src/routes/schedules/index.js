@@ -139,13 +139,8 @@ const POST = async (req, res) => {
 };
 
 const DELETE = async (req, res) => {
-  let scheduleIds;
-  if (typeof (req.query.id) === 'string') {
-    scheduleIds = [req.query.id];
-  } else {
-    scheduleIds = Object.values(req.query.id);
-  }
-  const parsedIds = [];
+  const scheduleIds = req.query.id.split(',');
+  let parsedIds = [];
   scheduleIds.forEach((id) => {
     try {
       parsedIds.push(mongoose.Types.ObjectId(id));
@@ -165,15 +160,12 @@ const DELETE = async (req, res) => {
     return Object(docs);
   });
 
-  const foundSchedules = [];
-  foundResult.forEach((project) => {
-    project.schedules.forEach((schedule) => {
-      foundSchedules.push(schedule);
-    });
-  });
-  // Log.warn(foundSchedules);
+  parsedIds = parsedIds.map((id) => String(id));
+  const foundSchedules = foundResult.map((project) => (
+    project.schedules.map((schedule) => parsedIds.includes(String(schedule._id)))
+  )).flat().filter((schedule) => schedule).length;
 
-  const removedResult = await Projects.updateMany({
+  await Projects.updateMany({
   }, {
     $pull: {
       schedules: {
@@ -186,10 +178,9 @@ const DELETE = async (req, res) => {
     if (err) {
       Log.error(err);
     }
-    return Object(docs);
   });
 
-  if (foundSchedules.length === removedResult.n) {
+  if (foundSchedules === parsedIds.length) {
     Response.success(res, {
       status: 200,
       data: {
@@ -200,7 +191,7 @@ const DELETE = async (req, res) => {
     Response.error(res, {
       status: 404,
       data: {
-        details: `Couldnt find ${removedResult.n - removedResult.nModified} schedules`,
+        details: `Couldnt find ${parsedIds.length - foundSchedules} schedules`,
       },
     });
   }
@@ -234,7 +225,7 @@ POST.apiDoc = {
   },
 };
 DELETE.apiDoc = {
-  summary: 'Delete schedule by ID.',
+  summary: 'Delete schedules by IDs.',
   operationId: 'deleteSchedule',
   consumes: ['application/json'],
   tags: [
@@ -246,7 +237,7 @@ DELETE.apiDoc = {
       name: 'id',
       required: true,
       type: 'string',
-      description: 'ID of schedule which will be deleted',
+      description: 'IDs of schedules which will be deleted',
     },
   ],
   responses: {

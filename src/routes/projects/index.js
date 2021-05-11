@@ -143,11 +143,28 @@ const DELETE = async (req, res) => {
 };
 
 const GET = async (req, res) => {
-  const docs = await Projects.find();
+  let docs;
+  const projection = {
+  };
+  if (req.query.names_only) {
+    projection.name = 1;
+  }
+  if (!req.query.id) {
+    docs = await Projects.find({
+    }, projection)
+      .skip(Number(req.query.offset))
+      .limit(Number(req.query.limit));
+  } else {
+    const projectsIDs = req.query.id.split(',');
+    docs = await Projects.findById(projectsIDs, projection)
+      .skip(Number(req.query.offset))
+      .limit(Number(req.query.limit));
+  }
+
   Response.success(res, {
     status: 200,
     data: {
-      details: 'List of all projects', data: docs,
+      details: 'List of projects', data: docs,
     },
   });
 };
@@ -200,16 +217,43 @@ GET.apiDoc = {
   tags: [
     __dirname.split(/[\\/]/).pop(),
   ],
+  parameters: [
+    {
+      in: 'query',
+      name: 'id',
+      type: 'string',
+      description: 'Filter by projects IDs',
+    },
+    {
+      in: 'query',
+      name: 'limit',
+      type: 'string',
+      description: 'Adds limit to queried projects',
+    },
+    {
+      in: 'query',
+      name: 'offset',
+      type: 'string',
+      description: 'Adds offset to queried projects',
+    },
+
+    {
+      in: 'query',
+      name: 'names_only',
+      type: 'string',
+      description: 'Return only IDs and names of queried projects',
+    },
+  ],
   responses: {
     200: {
-      description: 'Array of uploaded projects',
+      description: 'Array of projects',
       schema: responseJSONOpenAPIget200,
     },
   },
 };
 
 DELETE.apiDoc = {
-  summary: 'Delete project.',
+  summary: 'Delete single project.',
   operationId: 'deleteProject',
   tags: [
     __dirname.split(/[\\/]/).pop(),

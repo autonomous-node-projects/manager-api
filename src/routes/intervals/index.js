@@ -1,4 +1,5 @@
 const Response = require('services/responseCreator');
+
 require('database/db');
 
 const {
@@ -18,7 +19,7 @@ const GET = async (req, res) => {
 };
 
 const DELETE = async (req, res) => {
-  const results = req.query.id.map((id) => killInterval(id));
+  const results = req.query.id.split(',').map((id) => killInterval(id));
   if (results) {
     Response.success(res, {
       status: 200,
@@ -47,14 +48,14 @@ GET.apiDoc = {
   ],
   responses: {
     200: {
-      description: 'Array of running intervals.',
+      description: 'Get array of running intervals.',
     },
   },
 };
 
 DELETE.apiDoc = {
-  summary: 'Delete interval by ID.',
-  operationId: 'deleteTodo',
+  summary: 'Delete intervals by ID.',
+  operationId: 'deleteIntervals',
   tags: [
     __dirname.split(/[\\/]/).pop(),
   ],
@@ -65,12 +66,15 @@ DELETE.apiDoc = {
       name: 'id',
       required: true,
       type: 'string',
-      description: 'ID of interval',
+      description: 'IDs of intervals',
     },
   ],
   responses: {
     200: {
-      description: 'Delete',
+      description: 'Deleted selected intervals.',
+    },
+    400: {
+      description: 'Couldnt delete all selected intervals',
     },
   },
 };
