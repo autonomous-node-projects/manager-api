@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "details": {
+      "type": "string",
+      "minLength": 1
+    },
+    "data": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "required": [
+          "_id",
+          "name"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dataDirectory": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scripts": {
+            "type": "object",
+            "properties": {
+              "getEq": {
+                "type": "string",
+                "minLength": 1
+              },
+              "test": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "getEq",
+              "test"
+            ]
+          },
+          "schedules": {
+            "type": "array",
+            "items": {
+              "properties": {}
+            }
+          },
+          "__v": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "details",
+    "data"
+  ]
+}

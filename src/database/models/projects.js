@@ -7,7 +7,7 @@ const Project = new Schema({
     type: String, required: true,
   },
   dataDirectory: {
-    type: String, required: true,
+    type: String,
   },
   scripts: {
     type: Object, required: true,

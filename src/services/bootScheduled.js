@@ -1,12 +1,9 @@
-// Common
 const { Log } = require('@autonomous-node-projects/tools');
-const Projects = require('common/database/models/projects');
+const Projects = require('database/models/projects');
 
-// DB
-require('common/database/db.js');
+require('database/db.js');
 
-// Processes
-const { createProcessInterval } = require('common/processesManagment');
+const { createProcessInterval } = require('services/processesManagment');
 
 const runScheduled = async () => {
   const docs = await Projects.find();

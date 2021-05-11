@@ -2,14 +2,11 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "common/*": [
-        "./common/*"
+      "services/*": [
+        "./services/*"
       ],
       "routes/*": [
         "./routes/*"
-      ],
-      "reqSchemas/*": [
-        "./routes/schema/*"
       ],
       "filesManagers": [
         "./common/filesManagers.js"
@@ -17,6 +14,11 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "routes/intervals.js",
+    "routes/processes",
+    "routes/processes",
+    "routes/projects",
+    "routes/output"
   ]
 }

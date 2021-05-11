@@ -1,0 +1,36 @@
+{
+  "type": "array",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Array of schedules",
+  "minItems": 1,
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "required": [
+      "scriptName",
+      "every"
+    ],
+    "properties": {
+      "scriptName": {
+        "type": "string",
+        "minLength": 1
+      },
+      "every": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "timeType": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "value",
+          "timeType"
+        ]
+      }
+    }
+  }
+}

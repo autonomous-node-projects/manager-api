@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Response of Bad request",
+  "type": "object",
+  "properties": {
+    "_original": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "required": [
+        "body"
+      ]
+    },
+    "details": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "required": [
+          "message",
+          "type"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "properties": {}
+            }
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "context": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "key": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "label",
+              "key"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "_original",
+    "details"
+  ]
+}

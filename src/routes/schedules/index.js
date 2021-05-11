@@ -1,36 +1,21 @@
 /* eslint-disable no-underscore-dangle */
-// Express
-const express = require('express');
-
-// Mongo
 const mongoose = require('mongoose');
-require('common/database/db');
+require('database/db');
+const Projects = require('database/models/projects');
 
-// Common
 const { Log } = require('@autonomous-node-projects/tools');
-const Response = require('common/responseCreator');
-const calculateTimeMultiplier = require('common/timeMultiplier');
+const Response = require('services/responseCreator');
+const calculateTimeMultiplier = require('services/timeMultiplier');
 
-// Mongo
-const Projects = require('common/database/models/projects');
+const { createProcessInterval } = require('services/processesManagment');
+const checkSchema = require('services/schemaChecker');
 
-// Processes
-const { createProcessInterval } = require('common/processesManagment');
-const checkSchema = require('common/schemaChecker');
+const { jsonSchema: postBodyJSON, openAPISchema: postBodyOpenAPI } = require('./schema/post/body.schema');
 
-module.exports = express();
-const app = module.exports;
-
-// schemasManager
-const { schemasFilesManager } = require('common/filesManagers');
-
-//
-// Create schedules
-//
-app.put('/schedules', async (req, res) => {
+const POST = async (req, res) => {
   // Get schemas
   const schemas = {
-    body: await schemasFilesManager.readData('createSchedule/body.schema.json'),
+    body: postBodyJSON,
   };
 
   // Check schemas
@@ -58,7 +43,7 @@ app.put('/schedules', async (req, res) => {
     Response.error(res, {
       status: 404,
       data: {
-        details: `Didn't find in project with id: ${req.query.id}`,
+        details: `Didn't find project with id: ${req.query.id}`,
       },
     });
   }
@@ -143,7 +128,6 @@ app.put('/schedules', async (req, res) => {
       status: 201,
       data: {
         details: `Created new schedules(${body.length}) of commands in project ${projectName}`,
-        return: 'Returned data presents schedules ids with script names affilated with schedule',
         data: allSchedules.map((schedule) => (
           {
             id: schedule._id, scriptName: schedule.scriptName,
@@ -152,19 +136,11 @@ app.put('/schedules', async (req, res) => {
       },
     });
   }
-});
+};
 
-//
-// Delete schedules
-//
-app.delete('/schedules', async (req, res) => {
-  let scheduleIds;
-  if (typeof (req.query.id) === 'string') {
-    scheduleIds = [req.query.id];
-  } else {
-    scheduleIds = Object.values(req.query.id);
-  }
-  const parsedIds = [];
+const DELETE = async (req, res) => {
+  const scheduleIds = req.query.id.split(',');
+  let parsedIds = [];
   scheduleIds.forEach((id) => {
     try {
       parsedIds.push(mongoose.Types.ObjectId(id));
@@ -184,15 +160,12 @@ app.delete('/schedules', async (req, res) => {
     return Object(docs);
   });
 
-  const foundSchedules = [];
-  foundResult.forEach((project) => {
-    project.schedules.forEach((schedule) => {
-      foundSchedules.push(schedule);
-    });
-  });
-  // Log.warn(foundSchedules);
+  parsedIds = parsedIds.map((id) => String(id));
+  const foundSchedules = foundResult.map((project) => (
+    project.schedules.map((schedule) => parsedIds.includes(String(schedule._id)))
+  )).flat().filter((schedule) => schedule).length;
 
-  const removedResult = await Projects.updateMany({
+  await Projects.updateMany({
   }, {
     $pull: {
       schedules: {
@@ -205,10 +178,9 @@ app.delete('/schedules', async (req, res) => {
     if (err) {
       Log.error(err);
     }
-    return Object(docs);
   });
 
-  if (foundSchedules.length === removedResult.n) {
+  if (foundSchedules === parsedIds.length) {
     Response.success(res, {
       status: 200,
       data: {
@@ -219,8 +191,65 @@ app.delete('/schedules', async (req, res) => {
     Response.error(res, {
       status: 404,
       data: {
-        details: `Couldnt find ${removedResult.n - removedResult.nModified} schedules`,
+        details: `Couldnt find ${parsedIds.length - foundSchedules} schedules`,
       },
     });
   }
-});
+};
+
+// DOCUMENTATION
+POST.apiDoc = {
+  summary: 'Add new schedules.',
+  operationId: 'addSchedules',
+  consumes: ['application/json'],
+  tags: [
+    __dirname.split(/[\\/]/).pop(),
+  ],
+  parameters: [
+    {
+      in: 'query',
+      name: 'id',
+      required: true,
+      type: 'string',
+      description: 'ID of project with script which will be scheduled',
+    },
+    {
+      in: 'body',
+      name: 'schedules',
+      schema: postBodyOpenAPI,
+    }],
+  responses: {
+    201: {
+      description: 'Returned data presents schedules ids with script names affilated with schedule',
+    },
+  },
+};
+DELETE.apiDoc = {
+  summary: 'Delete schedules by IDs.',
+  operationId: 'deleteSchedule',
+  consumes: ['application/json'],
+  tags: [
+    __dirname.split(/[\\/]/).pop(),
+  ],
+  parameters: [
+    {
+      in: 'query',
+      name: 'id',
+      required: true,
+      type: 'string',
+      description: 'IDs of schedules which will be deleted',
+    },
+  ],
+  responses: {
+    200: {
+      description: 'Deleted successfully',
+    },
+  },
+};
+
+const operations = {
+  POST,
+  DELETE,
+};
+
+module.exports = operations;

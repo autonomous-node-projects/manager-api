@@ -1,13 +1,11 @@
 const { spawn } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 
-// Mongo
-require('common/database/db');
-const Scrapers = require('common/database/models/projects');
+require('database/db');
+const Scrapers = require('database/models/projects');
 
-// Common
 const { Log } = require('@autonomous-node-projects/tools');
-const calculateTimeMultiplier = require('common/timeMultiplier');
+const calculateTimeMultiplier = require('services/timeMultiplier');
 
 let processesList = [];
 let intervalsList = [];
