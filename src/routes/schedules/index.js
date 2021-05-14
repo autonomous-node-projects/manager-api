@@ -128,11 +128,7 @@ const POST = async (req, res) => {
       status: 201,
       data: {
         details: `Created new schedules(${body.length}) of commands in project ${projectName}`,
-        data: allSchedules.map((schedule) => (
-          {
-            id: schedule._id, scriptName: schedule.scriptName,
-          }
-        )),
+        data: allSchedules,
       },
     });
   }

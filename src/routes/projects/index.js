@@ -29,9 +29,9 @@ const POST = async (req, res) => {
     files: req.files,
     body: req.body,
   };
+
   // Check schemas
   const schemaResult = checkSchema(postFormDataJSON, formData);
-  Log(schemaResult);
 
   if (schemaResult.error) {
     Response.error(res, {

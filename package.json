@@ -1,6 +1,6 @@
 {
   "name": "autonomous-node-projects-manager",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Easy manager with automation for your node projects!",
   "main": "index.js",
   "nodemonConfig": {

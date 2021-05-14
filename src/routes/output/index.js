@@ -34,22 +34,30 @@ const GET = async (req, res) => {
       try {
         const dir = `${process.env.PROJECTS_FILES}${project.name}/${project.dataDirectory}`;
 
-        const tarFileAbsolutePath = resolve(`${process.env.TMP_FILES}${project.name}.tar`);
-        fs.mkdirSync(`${process.env.TMP_FILES}`, {
-          recursive: true,
-        });
+        if (fs.existsSync(dir)) {
+          const tarFileAbsolutePath = resolve(`${process.env.TMP_FILES}${project.name}.tar`);
+          fs.mkdirSync(`${process.env.TMP_FILES}`, {
+            recursive: true,
+          });
 
-        const writeStream = fs.createWriteStream(tarFileAbsolutePath);
-        const tarData = tar.pack(dir);
-        tarData.pipe(writeStream);
+          const writeStream = fs.createWriteStream(tarFileAbsolutePath);
+          const tarData = tar.pack(dir);
+          tarData.pipe(writeStream);
 
-        tarData.on('end', async () => {
-          res.setHeader('Content-Type', 'application/x-tar');
-          res.setHeader('Content-disposition', `attachment;filename=${project.name}.tar`);
-          res.sendFile(tarFileAbsolutePath);
-        });
+          tarData.on('end', async () => {
+            res.setHeader('Content-Type', 'application/x-tar');
+            res.setHeader('Content-disposition', `attachment;filename=${project.name}.tar`);
+            res.sendFile(tarFileAbsolutePath);
+          });
+        } else {
+          Response.error(res, {
+            status: 404,
+            data: {
+              details: 'This project has no data output directory',
+            },
+          });
+        }
       } catch (e) {
-        Log(e);
         Response.error(res, {
           status: 400,
           data: {
