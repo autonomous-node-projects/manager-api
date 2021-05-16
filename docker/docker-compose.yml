@@ -1,0 +1,30 @@
+version: "3.0"
+services:
+  anpm-api:
+    container_name: anpm-api
+    restart: always
+    build: ../
+    hostname: anpm-api
+    ports:
+      - '3000:3000'
+    volumes:
+      - ${API_DIR}:/usr/src/app/anpm-api/data
+    links:
+      - mongo
+  anpm-ui:
+    container_name: anpm-ui
+    restart: always
+    build: ../../manager-ui
+    ports:
+      - '80:80'
+    links:
+      - anpm-api
+  mongo:
+    container_name: anpm-db
+    hostname: mongo
+    restart: always
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - ${DB_DIR}:/data/db

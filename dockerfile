@@ -1,6 +1,6 @@
 FROM node:14.16
 MAINTAINER Daniel Goliszewski "taafeenn@gmail.com"
-WORKDIR /usr/src/app/server
+WORKDIR /usr/src/app/anpm-api
 COPY package*.json ./
 RUN npm install --only=prod
 COPY . .

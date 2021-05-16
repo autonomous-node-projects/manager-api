@@ -4,6 +4,7 @@ require('dotenv').config({
 const { Log } = require('@autonomous-node-projects/tools');
 
 const express = require('express');
+const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const bootScheduled = require('services/bootScheduled');
 
@@ -16,6 +17,9 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 const app = express();
+
+// Cors
+app.use(cors());
 
 // Load schedules
 bootScheduled();

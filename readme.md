@@ -3,7 +3,15 @@
 2. Scripts (if needed) *should* save output files in one directory which is easly accessible for manager
 3. Also should have some scripts to be run
 
-# Start guide:
+# Start guide (with docker): 
+1. Pull API `git clone https://github.com/autonomous-node-projects/manager-api.git` 
+2. Pull UI `git clone https://github.com/autonomous-node-projects/manager-ui.git`
+3. Edit `manager-api/env/env.prod` and `manager-ui/src/environments/environment.prod.ts`
+4. Go to `./manager-api/docker` directory and edit `.env` file
+5. In the same directory run both `docker-compose build` and `docker-compose up -d`
+6. Access ANPM from web browser under given host
+
+# Standalone Start guide:
 1. Create mongo database for `Autonomous node projects manager`
 2. Pull project to local directory
 3. Run `npm install`
@@ -39,5 +47,5 @@ Keys values: <br/>
 
 8. Download output data via `${API_IP}/output?type=download` endpoint
 
-### Documentation
+### API Documentation
 There is swagger viewer of Open API documentation under `${API_IP}/swagger`.
