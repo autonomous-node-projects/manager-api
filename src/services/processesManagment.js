@@ -1,8 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 const { spawn } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 
 require('database/db');
-const Scrapers = require('database/models/projects');
+const Projects = require('database/models/projects');
 
 const { Log } = require('@autonomous-node-projects/tools');
 const calculateTimeMultiplier = require('services/timeMultiplier');
@@ -69,25 +70,64 @@ const installPackages = async (projectName) => {
   });
 };
 
-const createProcessInterval = (
+const updateNextRun = async (scheduleId, everyDiffMs) => {
+  const nextRunUpdated = new Date(new Date().getTime() + everyDiffMs);
+  let project = await Projects.findOne({
+    'schedules._id': scheduleId,
+  });
+  project = Object(project);
+  const scheduleIndex = (
+    project.schedules.findIndex((schedule) => String(schedule._id) === String(scheduleId))
+  );
+  project.schedules[scheduleIndex].nextRun = nextRunUpdated;
+  Projects.updateOne({
+    'schedules._id': scheduleId,
+  },
+  {
+    $set: {
+      schedules: project.schedules,
+    },
+  },
+  {
+    upsert: true,
+  }, (err, docs) => {
+  });
+};
+
+const createProcessInterval = async ({
   projectName,
   scriptName,
   time,
   timeType,
   terminateAfter,
-) => {
+  scheduleId,
+  nextRun,
+}) => {
+  if (scheduleId) {
+    Log.warn(`Updating schedule next run${scheduleId}`);
+    const everyDiffMs = calculateTimeMultiplier(timeType) * time * 1000;
+    updateNextRun(scheduleId, everyDiffMs);
+  }
+  const intervalIndex = (
+    intervalsList.findIndex((interval) => interval.projectName === projectName)
+  );
+  const everyDiffMs = calculateTimeMultiplier(timeType) * time * 1000;
   const intervalId = uuidv4();
   let teminatingCount = terminateAfter;
-  const multiplier = calculateTimeMultiplier(timeType);
-
-  const msInterval = time * 1000 * multiplier;
+  const msInterval = time * 1000 * calculateTimeMultiplier(timeType);
 
   const processInterval = setInterval(async () => {
     spawnProcess(scriptName, projectName);
+
+    if (scheduleId) {
+      updateNextRun(scheduleId, everyDiffMs);
+    }
+
     if (teminatingCount !== undefined) {
+    // If exceeded exitAfter
       if (teminatingCount === 1) {
         // Update DB
-        Scrapers.updateOne({
+        Projects.updateOne({
           name: projectName,
         },
         {
@@ -101,24 +141,21 @@ const createProcessInterval = (
         });
         intervalsList = intervalsList.filter((interval) => interval.left !== 1);
         clearInterval(processInterval);
-      } else {
-        const index = intervalsList.findIndex((interval) => interval.projectName === projectName);
-        if (intervalsList[index]) {
-          intervalsList[index].left -= 1;
-          teminatingCount -= 1;
-          Scrapers.updateOne({
-            name: projectName,
-          },
-          {
-            'schedule.exitAfter': teminatingCount,
-          }, (err, docs) => {
-            if (err) {
-              Log.error(err);
-            } else {
-              Log(`Updated schedule in DB: ${docs}`);
-            }
-          });
-        }
+      } else if (intervalsList[intervalIndex]) {
+        intervalsList[intervalIndex].left -= 1;
+        teminatingCount -= 1;
+        Projects.updateOne({
+          name: projectName,
+        },
+        {
+          'schedule.exitAfter': teminatingCount,
+        }, (err, docs) => {
+          if (err) {
+            Log.error(err);
+          } else {
+            Log(`Updated schedule in DB: ${docs}`);
+          }
+        });
       }
     }
   }, msInterval);
@@ -133,6 +170,7 @@ const createProcessInterval = (
       timeType,
     },
     left: terminateAfter,
+    nextRun,
   });
 
   return intervalId;

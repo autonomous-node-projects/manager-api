@@ -6,7 +6,7 @@
 # Start guide (with docker): 
 1. Pull API `git clone https://github.com/autonomous-node-projects/manager-api.git` 
 2. Pull UI `git clone https://github.com/autonomous-node-projects/manager-ui.git`
-3. Edit `manager-api/env/env.prod` and `manager-ui/src/environments/environment.prod.ts`
+3. Edit `manager-api/env/.env.prod` and `manager-ui/src/environments/environment.prod.ts`
 4. Go to `./manager-api/docker` directory and edit `.env` file
 5. In the same directory run both `docker-compose build` and `docker-compose up -d`
 6. Access ANPM from web browser under given host

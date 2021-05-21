@@ -110,14 +110,17 @@ const POST = async (req, res) => {
     Log(`Starting new schedules for ${projectName} (${body.length})`);
 
     // Spawn processes once and Create Intervals
-    body.forEach((schedule) => {
-      const intervalId = createProcessInterval(
+    newSchedules.forEach((schedule) => {
+      Log.warn(schedule);
+      const intervalId = createProcessInterval({
         projectName,
-        schedule.scriptName,
-        schedule.every.value,
-        schedule.every.timeType,
-        schedule.exitAfter,
-      );
+        scriptName: schedule.scriptName,
+        time: schedule.every.value,
+        timeValue: schedule.every.timeType,
+        exitAfter: schedule.exitAfter,
+        _id: schedule._id,
+        nextRun: new Date(),
+      });
       return {
         id: intervalId, scriptName: schedule.scriptName,
       };

@@ -3,7 +3,6 @@ const fs = require('fs');
 const dirTree = require('directory-tree');
 const { resolve } = require('path');
 
-const { Log } = require('@autonomous-node-projects/tools');
 const Response = require('services/responseCreator');
 
 require('database/db');
