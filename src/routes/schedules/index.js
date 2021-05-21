@@ -46,9 +46,7 @@ const POST = async (req, res) => {
         details: `Didn't find project with id: ${req.query.id}`,
       },
     });
-  }
-
-  if (project) {
+  } else {
     const { body } = req;
     const projectName = project.name;
     // Check if all project scripts exists
@@ -108,7 +106,6 @@ const POST = async (req, res) => {
 
     const allSchedules = [...projectUpdated.schedules, ...newSchedules];
     Log(`Starting new schedules for ${projectName} (${body.length})`);
-
     // Spawn processes once and Create Intervals
     newSchedules.forEach((schedule) => {
       Log.warn(schedule);
@@ -116,10 +113,8 @@ const POST = async (req, res) => {
         projectName,
         scriptName: schedule.scriptName,
         time: schedule.every.value,
-        timeValue: schedule.every.timeType,
+        timeType: schedule.every.timeType,
         exitAfter: schedule.exitAfter,
-        _id: schedule._id,
-        nextRun: new Date(),
       });
       return {
         id: intervalId, scriptName: schedule.scriptName,
