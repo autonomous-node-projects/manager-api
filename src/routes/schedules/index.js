@@ -115,6 +115,7 @@ const POST = async (req, res) => {
         time: schedule.every.value,
         timeType: schedule.every.timeType,
         exitAfter: schedule.exitAfter,
+        scheduleId: schedule._id,
       });
       return {
         id: intervalId, scriptName: schedule.scriptName,
