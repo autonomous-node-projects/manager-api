@@ -12,6 +12,7 @@ const GET = async (req, res) => {
   if (!req.query.projectName) {
     docs = await Alerts.find({
     }, projection)
+      .sort('-alertCreationDate')
       .skip(Number(req.query.offset))
       .limit(Number(req.query.limit));
   } else {
@@ -19,6 +20,7 @@ const GET = async (req, res) => {
     docs = await Alerts.find({
       projectName,
     }, projection)
+      .sort('-alertCreationDate')
       .skip(Number(req.query.offset))
       .limit(Number(req.query.limit));
   }
