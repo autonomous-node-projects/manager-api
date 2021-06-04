@@ -23,7 +23,7 @@ const GET = async (req, res) => {
       .limit(Number(req.query.limit));
   }
   Response.success(res, {
-    status: 201,
+    status: 200,
     data: {
       details: 'List of alerts',
       data: docs,
