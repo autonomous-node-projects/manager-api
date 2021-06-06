@@ -13,7 +13,7 @@ const swaggerUi = require('swagger-ui-express');
 const openapiDocument = require('./documentation/api-doc');
 
 if (process.env.NODE_ENV === 'dev') {
-  Log.warn(`Running as ${process.env.NODE_ENV}`);
+  Log.warn(`Running as ${process.env.NODE_ENV} \n`);
 }
 
 const app = express();
@@ -54,6 +54,6 @@ app.use(
 );
 
 app.listen(process.env.API_PORT);
-Log(`Listening at http://localhost:${process.env.API_PORT}`);
-Log(`OpenAPI (swagger UI) documentation available at http://localhost:${process.env.API_PORT}${docsUrl}`);
-Log(`OpenAPI (raw JSON) documentation available at http://localhost:${process.env.API_PORT}/api-docs`);
+Log(`Listening at http://localhost:${process.env.API_PORT} \n`);
+Log(`OpenAPI (swagger UI) documentation available at http://localhost:${process.env.API_PORT}${docsUrl} \n\n`);
+// Log(`OpenAPI (raw JSON) documentation available at http://localhost:${process.env.API_PORT}/api-docs`);

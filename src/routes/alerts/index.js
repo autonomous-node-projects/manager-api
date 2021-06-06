@@ -1,5 +1,8 @@
+const webpush = require('web-push');
 const Response = require('services/responseCreator');
+
 const Alerts = require('database/models/alerts');
+const subscriber = require('database/models/subscriber');
 
 const checkSchema = require('services/schemaChecker');
 const { jsonSchema: postBodyJSON, openAPISchema: postBodyOpenAPI } = require('./schema/post/body.schema');
@@ -55,7 +58,44 @@ const POST = async (req, res) => {
   const alerts = body.map((alert) => ({
     ...alert, alertCreationDate: new Date().getTime(),
   }));
-    // Add entries to mongoDB
+
+  // Get all subscribers
+  const subscribers = await subscriber.find({
+  }, (err, docs) => {
+    if (!err) {
+      return docs;
+    }
+    return [];
+  });
+
+  alerts.forEach((alert) => {
+    const notificationPayload = {
+      notification: {
+        title: alert.content,
+        body: alert.name,
+        data: {
+          dateOfArrival: Date.now(),
+          primaryKey: 1,
+        },
+        actions: [{
+          action: 'explore',
+          title: 'Go to the site',
+        }],
+      },
+    };
+
+    // Send to all subscriber
+    subscribers.forEach((sub) => {
+      Log.warn(sub);
+      delete sub._id;
+      delete sub.__v;
+      webpush.sendNotification(
+        sub, JSON.stringify(notificationPayload),
+      );
+    });
+  });
+
+  // Add entries to mongoDB
   Alerts.insertMany(alerts, (err, doc) => {
     if (err) {
       Response.error(res, {
