@@ -15,6 +15,14 @@ const apiDoc = {
   },
   tags: [
     {
+      name: 'notifications',
+      description: 'All endpoints of notifications using Web-Push technology',
+    },
+    {
+      name: 'alerts',
+      description: 'All endpoints of alerts',
+    },
+    {
       name: 'intervals',
       description: 'All endpoints of intervals',
     },

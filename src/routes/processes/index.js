@@ -12,38 +12,47 @@ const {
 
 const POST = async (req, res) => {
   const project = await Projects.findById(req.query.id);
-  const processesInformation = await req.query.scriptName.split(',').map((scriptName) => {
-    if (Object.keys(project.scripts).includes(scriptName)) {
-      const processId = spawnProcess(scriptName, project.name);
+  if (project) {
+    const processesInformation = await req.query.scriptName.split(',').map((scriptName) => {
+      if (Object.keys(project.scripts).includes(scriptName)) {
+        const processId = spawnProcess(scriptName, project.name);
+        return {
+          scriptName,
+          processId,
+        };
+      }
       return {
         scriptName,
-        processId,
+        notFound: true,
       };
-    }
-    return {
-      scriptName,
-      notFound: true,
-    };
-  });
+    });
 
-  if (!processesInformation.find((processInfo) => { Object.keys(processInfo).includes('notFound'); })) {
-    Response.success(res, {
+    if (!processesInformation.find((processInfo) => Object.keys(processInfo).includes('notFound'))) {
+      Response.success(res, {
+        status: 201,
+        data: {
+          details: `started scripts in ${project.name}`,
+          data: {
+            ...processesInformation,
+          },
+        },
+      });
+    } else {
+      Response.success(res, {
+        status: 404,
+        data: {
+          details: `Couldnt find some scripts in ${project.name}`,
+          data: {
+            ...processesInformation,
+          },
+        },
+      });
+    }
+  } else {
+    Response.error(res, {
       status: 404,
       data: {
-        details: `started scripts in ${project.name}`,
-        data: {
-          ...processesInformation,
-        },
-      },
-    });
-  } else {
-    Response.success(res, {
-      status: 200,
-      data: {
-        details: `started scripts in ${project.name}`,
-        data: {
-          ...processesInformation,
-        },
+        details: `Couldnt find project with id ${req.query.id}`,
       },
     });
   }
@@ -65,7 +74,6 @@ const GET = async (req, res) => {
 
 const DELETE = async (req, res) => {
   const processesResult = req.query.id.split(',').map((id) => killProcess(id));
-  Log.warn(processesResult);
   if (!processesResult.includes(false)) {
     Response.success(res, {
       status: 200,
@@ -105,7 +113,7 @@ POST.apiDoc = {
     type: 'string',
   }],
   responses: {
-    200: {
+    201: {
       description: 'Started new processes',
     },
   },

@@ -12,16 +12,16 @@ const GET = async (req, res) => {
   let docs;
   const projection = {
   };
-  if (!req.query.projectName) {
+  if (!req.query.projectNames) {
     docs = await Alerts.find({
     }, projection)
       .sort('-alertCreationDate')
       .skip(Number(req.query.offset))
       .limit(Number(req.query.limit));
   } else {
-    const projectName = req.query.projectName.split(',');
+    const projectNames = req.query.projectNames.split(',');
     docs = await Alerts.find({
-      projectName,
+      projectName: projectNames,
     }, projection)
       .sort('-alertCreationDate')
       .skip(Number(req.query.offset))
@@ -86,9 +86,6 @@ const POST = async (req, res) => {
 
     // Send to all subscriber
     subscribers.forEach((sub) => {
-      Log.warn(sub);
-      delete sub._id;
-      delete sub.__v;
       webpush.sendNotification(
         sub, JSON.stringify(notificationPayload),
       );
@@ -126,9 +123,9 @@ GET.apiDoc = {
   parameters: [
     {
       in: 'query',
-      name: 'id',
+      name: 'projectNames',
       type: 'string',
-      description: 'Filter by projects IDs',
+      description: 'Filter by projects names',
     },
     {
       in: 'query',
