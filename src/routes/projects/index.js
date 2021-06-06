@@ -102,7 +102,7 @@ const POST = async (req, res) => {
 
 const DELETE = async (req, res) => {
   try {
-    const project = await Projects.findOneAndDelete(req.query.id);
+    const project = await Projects.findByIdAndDelete(req.query.id);
     if (project) {
       const dir = `${process.env.PROJECTS_FILES}/${project.name}`;
       // Halt currently runnings scripts of this project
